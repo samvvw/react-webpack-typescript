@@ -3,16 +3,21 @@ module.exports = {
         [
             '@babel/preset-env',
             {
-                modules: false,
+                modules: 'auto',
             },
         ],
-        '@babel/preset-react',
-		'@babel/preset-typescript'
+        [
+            '@babel/preset-react',
+            {
+                runtime: 'automatic',
+            },
+        ],
+        '@babel/preset-typescript',
     ],
     plugins: [
         '@babel/plugin-transform-runtime',
-        '@babel/plugin-syntax-dynamic-import',
-        '@babel/plugin-proposal-class-properties',
+        // '@babel/plugin-syntax-dynamic-import',
+        // '@babel/plugin-proposal-class-properties',
     ],
     env: {
         production: {

@@ -13,10 +13,15 @@ module.exports = function (_env, argv) {
     const env = dotenv.config().parsed
 
     // reduce it to object
-    const envKeys = Object.keys(env).reduce((prev, next) => {
-        prev[`process.env.${next}`] = JSON.stringify(env[next])
-        return prev
-    }, {})
+    let envKeys
+    if (env) {
+        envKeys = Object.keys(env).reduce((prev, next) => {
+            prev[`process.env.${next}`] = JSON.stringify(env[next])
+            return prev
+        }, {})
+    } else {
+        envKeys = {}
+    }
 
     return {
         // tool used to generate source-map
@@ -49,26 +54,30 @@ module.exports = function (_env, argv) {
                 },
                 // Loads css files
                 {
-                    test: /\.css$/,
+                    test: /\.s[ac]ss$/i,
                     use: [
                         isProduction
                             ? MiniCssExtractPlugin.loader
                             : 'style-loader',
                         'css-loader',
+                        'sass-loader',
                     ],
                 },
-				{
-					test: /\.module.css$/,
-					use: [
-						isProduction? MiniCssExtractPlugin.loader : 'style-loader',
-						{
-							loader: 'css-loader',
-							options: {
-								module: true
-							}
-						}
-					]
-				},
+                {
+                    test: /\.module.css$/i,
+                    use: [
+                        isProduction
+                            ? MiniCssExtractPlugin.loader
+                            : 'style-loader',
+                        {
+                            loader: 'css-loader',
+                            options: {
+                                importLoaders: 1,
+                                modules: true,
+                            },
+                        },
+                    ],
+                },
                 // Loads images embedding them in the URL as base64-encoded
                 {
                     test: /\.(png|jpg|git)$/i,
@@ -97,7 +106,7 @@ module.exports = function (_env, argv) {
         },
         // Use these extensions
         resolve: {
-            extensions: ['.js', '.jsx', '.ts', '.tsx'],
+            extensions: ['.js', '.jsx', '.ts', '.tsx', '.css'],
         },
         // plugin section
         plugins: [
@@ -111,9 +120,9 @@ module.exports = function (_env, argv) {
                 template: path.resolve(__dirname, 'public/index.html'),
                 inject: true,
             }),
-			new ForkTsCheckerWebpackPlugin({
-				async: false
-			})
+            new ForkTsCheckerWebpackPlugin({
+                async: false,
+            }),
         ].filter(Boolean),
         optimization: {
             minimize: isProduction,
