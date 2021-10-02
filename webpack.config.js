@@ -1,3 +1,4 @@
+/* eslint @typescript-eslint/no-var-requires: "off" */
 const path = require('path')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const webpack = require('webpack')
@@ -5,6 +6,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 const TerserWebpackPlugin = require('terser-webpack-plugin')
 const CssMinimizerPlugin = require('css-minimizer-webpack-plugin')
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin')
+const ESLintPlugin = require('eslint-webpack-plugin')
 const dotenv = require('dotenv')
 
 module.exports = function (_env, argv) {
@@ -123,6 +125,10 @@ module.exports = function (_env, argv) {
             new ForkTsCheckerWebpackPlugin({
                 async: false,
             }),
+            new ESLintPlugin({
+                extensions: ['.js', '.jsx', '.ts', '.tsx'],
+                exclude: ['node_modules', 'dist'],
+            }),
         ].filter(Boolean),
         optimization: {
             minimize: isProduction,
@@ -175,7 +181,10 @@ module.exports = function (_env, argv) {
             historyApiFallback: true,
             open: true,
             client: {
-                overlay: true,
+                overlay: {
+                    errors: true,
+                    warnings: false,
+                },
             },
         },
     }
